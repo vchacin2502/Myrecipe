@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Registro{% endblock %}
+
+{% block content %}
+    <h1>Crear cuenta</h1>
+    <form method="POST">
+        {% csrf_token %}
+    <div style="margin-bottom: 10px;">
+        <label>Nombre de usuario</label>
+        {{ formulario.username }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <label>Contraseña</label>
+        {{ formulario.password1 }}
+    </div>
+    <div style="margin-bottom: 10px;">
+        <label>Confirmar contraseña</label>
+        {{ formulario.password2 }}
+    </div>
+
+        <button type="submit">Registrar</button>
+    </form>
+    <a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+{% endblock %}

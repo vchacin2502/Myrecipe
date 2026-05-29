@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Crear receta{% endblock %}
+
+{% block content %}
+    <h1>Nueva receta</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <label>Título</label>
+            {{ formulario.titulo }}
+        </div>
+        <div>
+            <label>Ingredientes</label>
+            {{ formulario.ingredientes }}
+        </div>
+        <div>
+            <label>Pasos de elaboración</label>
+            {{ formulario.pasos_elaboracion }}
+        </div>
+        <div>
+            <label>Tiempo de preparación (minutos)</label>
+            {{ formulario.tiempo_preparacion }}
+        </div>
+        <div>
+            <label>Categoría</label>
+            {{ formulario.categoria }}
+        </div>
+        {{ formulario.errors }}
+        <button type="submit">Guardar receta</button>
+    </form>
+    <a href="{% url 'lista_recetas' %}">Volver</a>
+{% endblock %}
