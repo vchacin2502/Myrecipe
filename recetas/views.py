@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .models import Receta, Categoria, Comentario
+from .models import Receta, Comentario
+from .forms import Formulario_receta, Formulario_comentario
 from .forms import Formulario_receta
-
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 
 def vista_recetas(request):
     recetas = Receta.objects.all()
@@ -11,8 +13,13 @@ def vista_recetas(request):
 
 def detalle_receta(request, receta_id):
     receta = get_object_or_404(Receta, id=receta_id)
-    comentarios = receta.comentarios.all()
-    return render(request, 'detalle_receta.html', {'receta': receta, 'comentarios': comentarios})
+    comentarios = receta.comentario_set.all()
+    formulario_comentario = Formulario_comentario()
+    return render(request, 'detalle_receta.html', {
+        'receta': receta,
+        'comentarios': comentarios,
+        'formulario_comentario': formulario_comentario
+    })
 
 @login_required
 def crear_receta(request):
@@ -49,7 +56,7 @@ def eliminar_receta(request, receta_id):
     if request.method == 'POST':
         receta.delete()
         return redirect('lista_recetas')
-    return render(request, 'eliminar_receta.html', {'receta': receta})
+    return redirect('lista_recetas')
 
 @login_required
 def comentar_receta(request, receta_id):
@@ -71,14 +78,17 @@ def eliminar_comentario(request, comentario_id):
     if request.method == 'POST':
         receta_id = comentario.receta.id
         comentario.delete()
-    return redirect('detalle_receta', receta_id=receta_id)
+        return redirect('detalle_receta', receta_id=receta_id)
+    return redirect('lista_recetas')
 
 def registrar_usuario(request):
     if request.method == 'POST':
         formulario = UserCreationForm(request.POST)
         if formulario.is_valid():
-            formulario.save()
+            usuario = formulario.save()
+            login(request, usuario)
             return redirect('lista_recetas')
     else:
         formulario = UserCreationForm()
     return render(request, 'registrar_usuario.html', {'formulario': formulario})
+

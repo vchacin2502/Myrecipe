@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block titulo %}{{ receta.titulo }}{% endblock %}
+
+{% block content %}
+    <h1>{{ receta.titulo }}</h1>
+    <p>Autor: {{ receta.autor }}</p>
+    <p>Categoría: {{ receta.categoria }}</p>
+    <p>Tiempo de preparación: {{ receta.tiempo_preparacion }} minutos</p>
+    <h2>Ingredientes</h2>
+    <p>{{ receta.ingredientes }}</p>
+    <h2>Pasos de elaboración</h2>
+    <p>{{ receta.pasos_elaboracion }}</p>
+
+    {% if user == receta.autor %}
+        <a href="{% url 'editar_receta' receta_id=receta.id %}">Editar</a>
+        <form method="POST" action="{% url 'eliminar_receta' receta_id=receta.id %}">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('¿Seguro que quieres eliminar esta receta?')">Eliminar</button>
+        </form>
+    {% endif %}
+
+    <h2>Comentarios</h2>
+    {% for comentario in comentarios %}
+        <div>
+            <p>{{ comentario.autor }}: {{ comentario.contenido }}</p>
+            {% if user == comentario.autor %}
+                <form method="POST" action="{% url 'eliminar_comentario' comentario_id=comentario.id %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('¿Eliminar este comentario?')">Eliminar comentario</button>
+                </form>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No hay comentarios todavía.</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <h3>Añadir comentario</h3>
+        <form method="POST" action="{% url 'comentar_receta' receta_id=receta.id %}">
+            {% csrf_token %}
+            {{ formulario_comentario.contenido }}
+            <button type="submit">Comentar</button>
+        </form>
+    {% endif %}
+
+    <a href="{% url 'lista_recetas' %}">Volver</a>
+{% endblock %}
