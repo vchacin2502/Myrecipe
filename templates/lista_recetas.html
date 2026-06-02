@@ -4,6 +4,19 @@
 
 {% block content %}
     <h1>Recetas</h1>
+    
+    <form method="GET">
+        <input type="text" name="q" placeholder="Buscar recetas..." value="{{ request.GET.q }}">
+        <select name="categoria">
+            <option value="">Todas las categorías</option>
+            {% for cat in categorias %}
+                <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="autor" placeholder="Buscar por autor..." value="{{ request.GET.autor }}">
+        <button type="submit">Buscar</button>
+    </form>
+
     {% for receta in recetas %}
         <div>
             <h2>{{ receta.titulo }}</h2>
@@ -12,6 +25,6 @@
             <a href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
         </div>
     {% empty %}
-        <p>No hay recetas todavía.</p>
+        <p>No hay recetas.</p>
     {% endfor %}
 {% endblock %}

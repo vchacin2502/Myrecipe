@@ -1,15 +1,30 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .models import Receta, Comentario
+from .models import Categoria, Receta, Comentario
 from .forms import Formulario_receta, Formulario_comentario
-from .forms import Formulario_receta
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 
 def vista_recetas(request):
     recetas = Receta.objects.all()
-    return render(request, 'lista_recetas.html', {'recetas': recetas})
+    
+    q = request.GET.get('q')
+    categoria = request.GET.get('categoria')
+    autor = request.GET.get('autor')
+    
+    if q:
+        recetas = recetas.filter(titulo__icontains=q)
+    if categoria:
+        recetas = recetas.filter(categoria__id=categoria)
+    if autor:
+        recetas = recetas.filter(autor__username__icontains=autor)
+    
+    categorias = Categoria.objects.all()
+    return render(request, 'lista_recetas.html', {
+        'recetas': recetas,
+        'categorias': categorias
+    })
 
 def detalle_receta(request, receta_id):
     receta = get_object_or_404(Receta, id=receta_id)
