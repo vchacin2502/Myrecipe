@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1>Nueva receta</h1>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div>
             <label>Título</label>
@@ -25,6 +25,10 @@
         <div>
             <label>Categoría</label>
             {{ formulario.categoria }}
+        </div>
+        <div>
+            <label>Imagen</label>
+            {{ formulario.imagen }}
         </div>
         {{ formulario.errors }}
         <button type="submit">Guardar receta</button>

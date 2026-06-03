@@ -19,6 +19,9 @@
 
     {% for receta in recetas %}
         <div>
+            {% if receta.imagen %}
+                <img src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
+            {% endif %}
             <h2>{{ receta.titulo }}</h2>
             <p>{{ receta.categoria }}</p>
             <p>{{ receta.autor }}</p>

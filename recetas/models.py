@@ -16,6 +16,8 @@ class Receta(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    favoritos = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='recetas_favoritas', blank=True)
+    imagen = models.ImageField(upload_to='recetas/')
 
     def __str__(self):
         return self.titulo

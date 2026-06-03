@@ -39,7 +39,7 @@ def detalle_receta(request, receta_id):
 @login_required
 def crear_receta(request):
     if request.method == 'POST':
-        formulario = Formulario_receta(request.POST)
+        formulario = Formulario_receta(request.POST, request.FILES)
         if formulario.is_valid():
             receta = formulario.save(commit=False)
             receta.autor = request.user
@@ -55,7 +55,7 @@ def editar_receta(request, receta_id):
     if request.user != receta.autor:
         return redirect('lista_recetas')
     if request.method == 'POST':
-        formulario = Formulario_receta(request.POST, instance=receta)
+        formulario = Formulario_receta(request.POST, request.FILES, instance=receta)
         if formulario.is_valid():
             formulario.save()
             return redirect('detalle_receta', receta_id=receta.id)
@@ -107,3 +107,22 @@ def registrar_usuario(request):
         formulario = UserCreationForm()
     return render(request, 'registrar_usuario.html', {'formulario': formulario})
 
+@login_required
+def toggle_favorito(request, receta_id):
+    receta = get_object_or_404(Receta, id=receta_id)
+    if request.user in receta.favoritos.all():
+        receta.favoritos.remove(request.user)
+    else:
+        receta.favoritos.add(request.user)
+    return redirect('detalle_receta', receta_id=receta.id)
+
+@login_required
+def mis_favoritos(request):
+    recetas = request.user.recetas_favoritas.all()
+    return render(request, 'mis_favoritos.html', {'recetas': recetas})
+
+def perfil_usuario(request, username):
+    from django.contrib.auth.models import User
+    usuario = get_object_or_404(User, username=username)
+    recetas = Receta.objects.filter(autor=usuario)
+    return render(request, 'perfil.html', {'usuario': usuario, 'recetas': recetas})

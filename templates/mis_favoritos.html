@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block titulo %}Mis favoritos{% endblock %}
+{% block content %}
+<h1>Mis recetas favoritas</h1>
+{% for receta in recetas %}
+<div>
+    {% if receta.imagen %}
+        <img src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
+    {% endif %}
+    <h2>{{ receta.titulo }}</h2>
+    <p>{{ receta.categoria }}</p>
+    <p>{{ receta.autor }}</p>
+    <a href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
+</div>
+{% empty %}
+<p>No tienes recetas favoritas todavía.</p>
+{% endfor %}
+<a href="{% url 'lista_recetas' %}">Volver</a>
+{% endblock %}

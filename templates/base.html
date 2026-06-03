@@ -15,6 +15,7 @@
         <div>
             {% if user.is_authenticated %}
                 <span>{{ user.username }}</span>
+                <a href="{% url 'mis_favoritos' %}">Mis favoritos</a>
                 <a href="{% url 'crear_receta' %}">Nueva receta</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
