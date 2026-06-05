@@ -2,9 +2,6 @@
 venv/
 env/
 
-# Base de datos
-db.sqlite3
-
 # Python
 __pycache__/
 *.pyc
@@ -16,5 +13,3 @@ __pycache__/
 # IDEs
 .vscode/
 .idea/
-
-media/
