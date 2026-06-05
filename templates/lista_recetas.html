@@ -3,31 +3,74 @@
 {% block titulo %}Lista de recetas{% endblock %}
 
 {% block content %}
-    <h1>Recetas</h1>
-    
-    <form method="GET">
-        <input type="text" name="q" placeholder="Buscar recetas..." value="{{ request.GET.q }}">
-        <select name="categoria">
-            <option value="">Todas las categorías</option>
-            {% for cat in categorias %}
-                <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" name="autor" placeholder="Buscar por autor..." value="{{ request.GET.autor }}">
-        <button type="submit">Buscar</button>
-    </form>
-
-    {% for receta in recetas %}
-        <div>
-            {% if receta.imagen %}
-                <img src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
-            {% endif %}
-            <h2>{{ receta.titulo }}</h2>
-            <p>{{ receta.categoria }}</p>
-            <p>{{ receta.autor }}</p>
-            <a href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
+    {% if user.is_authenticated %}
+        <div class="content-panel d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">Recetas</h1>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-brand rounded-pill px-4" href="{% url 'crear_receta' %}">Nueva receta</a>
+            </div>
         </div>
-    {% empty %}
-        <p>No hay recetas.</p>
-    {% endfor %}
+    {% endif %}
+
+    <section class="search-panel p-3 p-lg-4 mb-4 mb-lg-5">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-lg-5">
+                <label for="search-receta" class="form-label">Buscar receta</label>
+                <input id="search-receta" type="text" class="form-control" name="q" placeholder="Busca por título" value="{{ request.GET.q }}">
+            </div>
+            <div class="col-lg-3">
+                <label for="categoria" class="form-label">Categoría</label>
+                <select id="categoria" name="categoria" class="form-select">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <label for="autor" class="form-label">Autor</label>
+                <input id="autor" type="text" class="form-control" name="autor" placeholder="Nombre de usuario" value="{{ request.GET.autor }}">
+            </div>
+            <div class="col-lg-1 d-grid">
+                <button type="submit" class="btn btn-brand rounded-pill">Buscar</button>
+            </div>
+        </form>
+    </section>
+
+    {% if recetas %}
+        <div class="row g-4">
+            {% for receta in recetas %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="recipe-card">
+                        {% if receta.imagen %}
+                            <img class="recipe-card__image" src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
+                        {% else %}
+                            <div class="recipe-card__image d-grid place-content-center bg-light text-center text-muted">Sin imagen</div>
+                        {% endif %}
+                        <div class="recipe-card__body d-flex flex-column gap-3">
+                            <div>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge-soft">{{ receta.categoria|default:"Sin categoría" }}</span>
+                                    <span class="badge-soft">{{ receta.tiempo_preparacion }} min</span>
+                                </div>
+                                <h2 class="recipe-card__title h4">{{ receta.titulo }}</h2>
+                                <p class="meta-list mb-0">Por <a href="{% url 'perfil_usuario' username=receta.autor.username %}" class="link-dark fw-semibold text-decoration-none">{{ receta.autor }}</a></p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a class="btn btn-outline-dark rounded-pill px-3" href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
+                                <span class="text-muted small">{{ receta.fecha_creacion|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state text-center">
+            <h2 class="h4 mb-2">No hay recetas.</h2>
+            <p class="mb-0">Prueba a quitar filtros o crea la primera receta del sitio.</p>
+        </div>
+    {% endif %}
 {% endblock %}

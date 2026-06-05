@@ -1,13 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from .models import Categoria, Receta, Comentario
-from .forms import Formulario_receta, Formulario_comentario
+from .forms import Formulario_receta, Formulario_comentario, FormularioRegistro
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 
 def vista_recetas(request):
-    recetas = Receta.objects.all()
+    recetas = Receta.objects.select_related('categoria', 'autor').order_by('-fecha_creacion')
     
     q = request.GET.get('q')
     categoria = request.GET.get('categoria')
@@ -20,14 +18,14 @@ def vista_recetas(request):
     if autor:
         recetas = recetas.filter(autor__username__icontains=autor)
     
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.order_by('nombre')
     return render(request, 'lista_recetas.html', {
         'recetas': recetas,
         'categorias': categorias
     })
 
 def detalle_receta(request, receta_id):
-    receta = get_object_or_404(Receta, id=receta_id)
+    receta = get_object_or_404(Receta.objects.select_related('categoria', 'autor'), id=receta_id)
     comentarios = receta.comentario_set.all()
     formulario_comentario = Formulario_comentario()
     return render(request, 'detalle_receta.html', {
@@ -98,13 +96,13 @@ def eliminar_comentario(request, comentario_id):
 
 def registrar_usuario(request):
     if request.method == 'POST':
-        formulario = UserCreationForm(request.POST)
+        formulario = FormularioRegistro(request.POST)
         if formulario.is_valid():
             usuario = formulario.save()
             login(request, usuario)
             return redirect('lista_recetas')
     else:
-        formulario = UserCreationForm()
+        formulario = FormularioRegistro()
     return render(request, 'registrar_usuario.html', {'formulario': formulario})
 
 @login_required
@@ -118,11 +116,11 @@ def toggle_favorito(request, receta_id):
 
 @login_required
 def mis_favoritos(request):
-    recetas = request.user.recetas_favoritas.all()
+    recetas = request.user.recetas_favoritas.select_related('categoria', 'autor').all().order_by('-fecha_creacion')
     return render(request, 'mis_favoritos.html', {'recetas': recetas})
 
 def perfil_usuario(request, username):
     from django.contrib.auth.models import User
     usuario = get_object_or_404(User, username=username)
-    recetas = Receta.objects.filter(autor=usuario)
+    recetas = Receta.objects.filter(autor=usuario).select_related('categoria', 'autor').order_by('-fecha_creacion')
     return render(request, 'perfil.html', {'usuario': usuario, 'recetas': recetas})

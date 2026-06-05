@@ -1,19 +1,42 @@
 {% extends 'base.html' %}
 {% block titulo %}Mis favoritos{% endblock %}
 {% block content %}
-<h1>Mis recetas favoritas</h1>
-{% for receta in recetas %}
-<div>
-    {% if receta.imagen %}
-        <img src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
-    {% endif %}
-    <h2>{{ receta.titulo }}</h2>
-    <p>{{ receta.categoria }}</p>
-    <p>{{ receta.autor }}</p>
-    <a href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
+<section class="content-panel mb-4">
+    <h1 class="display-6 fw-semibold mb-2">Tus recetas favoritas</h1>
+    <p class="muted-text mb-0">Aquí quedan las recetas que marcaste para volver a ellas sin buscarlas otra vez.</p>
+</section>
+
+{% if recetas %}
+    <div class="row g-4">
+        {% for receta in recetas %}
+            <div class="col-md-6 col-xl-4">
+                <article class="recipe-card">
+                    {% if receta.imagen %}
+                        <img class="recipe-card__image" src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
+                    {% endif %}
+                    <div class="recipe-card__body d-flex flex-column gap-3">
+                        <div>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge-soft">{{ receta.categoria|default:"Sin categoría" }}</span>
+                                <span class="badge-soft">{{ receta.tiempo_preparacion }} min</span>
+                            </div>
+                            <h2 class="recipe-card__title h4">{{ receta.titulo }}</h2>
+                            <p class="meta-list mb-0">Por {{ receta.autor }}</p>
+                        </div>
+                        <a class="btn btn-outline-dark rounded-pill px-3 align-self-start" href="{% url 'detalle_receta' receta_id=receta.id %}">Ver receta</a>
+                    </div>
+                </article>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state text-center">
+        <h2 class="h4 mb-2">No tienes recetas favoritas todavía.</h2>
+        <p class="mb-0">Marca alguna receta con el botón de favoritos para verla aquí.</p>
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{% url 'lista_recetas' %}" class="btn btn-outline-dark rounded-pill px-4">Volver</a>
 </div>
-{% empty %}
-<p>No tienes recetas favoritas todavía.</p>
-{% endfor %}
-<a href="{% url 'lista_recetas' %}">Volver</a>
 {% endblock %}

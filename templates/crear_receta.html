@@ -3,35 +3,56 @@
 {% block titulo %}Crear receta{% endblock %}
 
 {% block content %}
-    <h1>Nueva receta</h1>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div>
-            <label>Título</label>
-            {{ formulario.titulo }}
+    <section class="form-shell">
+        <div class="auth-illustration p-4 p-lg-5 text-center mb-4">
+            <h1 class="display-5 fw-semibold mb-2">Nueva receta</h1>
+            <p class="mb-0 text-white-50 mx-auto" style="max-width: 56rem;">Comparte tu idea con ingredientes, pasos claros y una foto apetecible.</p>
         </div>
-        <div>
-            <label>Ingredientes</label>
-            {{ formulario.ingredientes }}
+        <div class="form-card p-4 p-lg-5">
+            <form method="POST" enctype="multipart/form-data" class="d-grid gap-4">
+                {% csrf_token %}
+                {% if formulario.non_field_errors %}
+                    <div class="alert alert-danger">{{ formulario.non_field_errors }}</div>
+                {% endif %}
+                <div>
+                    <label for="id_titulo" class="form-label">Título</label>
+                    {{ formulario.titulo }}
+                    {{ formulario.titulo.errors }}
+                </div>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-4">
+                        <label for="id_tiempo_preparacion" class="form-label">Tiempo de preparación</label>
+                        {{ formulario.tiempo_preparacion }}
+                        {{ formulario.tiempo_preparacion.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_categoria" class="form-label">Categoría</label>
+                        {{ formulario.categoria }}
+                        {{ formulario.categoria.errors }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_imagen" class="form-label">Imagen</label>
+                        {{ formulario.imagen }}
+                        {{ formulario.imagen.errors }}
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-xl-4">
+                        <label for="id_ingredientes" class="form-label">Ingredientes</label>
+                        {{ formulario.ingredientes }}
+                        {{ formulario.ingredientes.errors }}
+                    </div>
+                    <div class="col-xl-8">
+                        <label for="id_pasos_elaboracion" class="form-label">Pasos de elaboración</label>
+                        {{ formulario.pasos_elaboracion }}
+                        {{ formulario.pasos_elaboracion.errors }}
+                    </div>
+                </div>
+                <div class="form-actions pt-2">
+                    <button type="submit" class="btn btn-brand rounded-pill px-4">Guardar receta</button>
+                    <a href="{% url 'lista_recetas' %}" class="btn btn-outline-dark rounded-pill px-4">Volver</a>
+                </div>
+            </form>
         </div>
-        <div>
-            <label>Pasos de elaboración</label>
-            {{ formulario.pasos_elaboracion }}
-        </div>
-        <div>
-            <label>Tiempo de preparación (minutos)</label>
-            {{ formulario.tiempo_preparacion }}
-        </div>
-        <div>
-            <label>Categoría</label>
-            {{ formulario.categoria }}
-        </div>
-        <div>
-            <label>Imagen</label>
-            {{ formulario.imagen }}
-        </div>
-        {{ formulario.errors }}
-        <button type="submit">Guardar receta</button>
-    </form>
-    <a href="{% url 'lista_recetas' %}">Volver</a>
+    </section>
 {% endblock %}

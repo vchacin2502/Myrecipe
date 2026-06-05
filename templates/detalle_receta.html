@@ -1,61 +1,110 @@
 {% extends 'base.html' %}
 {% block titulo %}{{ receta.titulo }}{% endblock %}
 {% block content %}
-<h1>{{ receta.titulo }}</h1>
-{% if receta.imagen %}
-    <img src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
-{% endif %}
-<p>Autor: <a href="{% url 'perfil_usuario' username=receta.autor.username %}">{{ receta.autor }}</a></p>
-<p>Categoría: {{ receta.categoria }}</p>
-<p>Tiempo de preparación: {{ receta.tiempo_preparacion }} minutos</p>
+<section class="detail-shell mb-4 mb-lg-5">
+    <div class="row g-4 align-items-start">
+        <div class="col-lg-7 detail-hero">
+            {% if receta.imagen %}
+                <img class="detail-hero__image" src="{{ receta.imagen.url }}" alt="{{ receta.titulo }}">
+            {% else %}
+                <div class="detail-hero__image d-grid place-content-center bg-light text-muted text-center p-5">Esta receta no tiene imagen todavía</div>
+            {% endif %}
+        </div>
+        <div class="col-lg-5">
+            <h1 class="display-6 fw-semibold mb-3">{{ receta.titulo }}</h1>
+            <p class="muted-text mb-4">Autor: <a href="{% url 'perfil_usuario' username=receta.autor.username %}" class="link-dark fw-semibold text-decoration-none">{{ receta.autor }}</a></p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="badge-soft">{{ receta.categoria|default:"Sin categoría" }}</span>
+                <span class="badge-soft">{{ receta.tiempo_preparacion }} minutos</span>
+                <span class="badge-soft">{{ receta.fecha_creacion|date:"d M Y" }}</span>
+            </div>
 
-{% if user.is_authenticated %}
-    <form method="POST" action="{% url 'toggle_favorito' receta_id=receta.id %}">
-        {% csrf_token %}
-        {% if request.user in receta.favoritos.all %}
-            <button type="submit">★ Quitar de favoritos</button>
-        {% else %}
-            <button type="submit">☆ Añadir a favoritos</button>
-        {% endif %}
-    </form>
-{% endif %}
+            <div class="detail-actions mb-4">
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'toggle_favorito' receta_id=receta.id %}">
+                        {% csrf_token %}
+                        {% if request.user in receta.favoritos.all %}
+                            <button type="submit" class="btn btn-dark rounded-pill px-4">Quitar de favoritos</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-brand rounded-pill px-4">Añadir a favoritos</button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+                {% if user == receta.autor %}
+                    <a href="{% url 'editar_receta' receta_id=receta.id %}" class="btn btn-outline-dark rounded-pill px-4">Editar</a>
+                    <form method="POST" action="{% url 'eliminar_receta' receta_id=receta.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4" onclick="return confirm('¿Seguro que quieres eliminar esta receta?')">Eliminar</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 
-{% if user == receta.autor %}
-<a href="{% url 'editar_receta' receta_id=receta.id %}">Editar</a>
-<form method="POST" action="{% url 'eliminar_receta' receta_id=receta.id %}">
-{% csrf_token %}
-<button type="submit" onclick="return confirm('¿Seguro que quieres eliminar esta receta?')">Eliminar</button>
-</form>
-{% endif %}
+<section class="row g-4 mb-4 mb-lg-5">
+    <div class="col-lg-6">
+        <div class="content-panel h-100">
+            <h2 class="section-title h3">Ingredientes</h2>
+            <div class="muted-text">{{ receta.ingredientes|linebreaks }}</div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="content-panel h-100">
+            <h2 class="section-title h3">Pasos de elaboración</h2>
+            <div class="muted-text">{{ receta.pasos_elaboracion|linebreaks }}</div>
+        </div>
+    </div>
+</section>
 
-<h2>Ingredientes</h2>
-<p>{{ receta.ingredientes }}</p>
-<h2>Pasos de elaboración</h2>
-<p>{{ receta.pasos_elaboracion }}</p>
+<section class="comment-shell mb-4 mb-lg-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+        <div>
+            <h2 class="section-title h3 mb-1">Comentarios</h2>
+            <p class="muted-text mb-0">Opiniones, variaciones y sugerencias para mejorar la receta.</p>
+        </div>
+        <span class="badge-soft">{{ comentarios|length }} comentarios</span>
+    </div>
 
-<h2>Comentarios</h2>
-{% for comentario in comentarios %}
-<div>
-<p>{{ comentario.autor }}: {{ comentario.contenido }}</p>
-{% if user == comentario.autor %}
-<form method="POST" action="{% url 'eliminar_comentario' comentario_id=comentario.id %}">
-{% csrf_token %}
-<button type="submit" onclick="return confirm('¿Eliminar este comentario?')">Eliminar comentario</button>
-</form>
-{% endif %}
-</div>
-{% empty %}
-<p>No hay comentarios todavía.</p>
-{% endfor %}
+    <div class="d-grid gap-3 mb-4">
+        {% for comentario in comentarios %}
+            <article class="comment-item">
+                <div class="d-flex justify-content-between gap-3 mb-2">
+                    <div>
+                        <strong>{{ comentario.autor }}</strong>
+                        <div class="comment-meta">{{ comentario.fecha_creacion|date:"d M Y, H:i" }}</div>
+                    </div>
+                    {% if user == comentario.autor %}
+                        <form method="POST" action="{% url 'eliminar_comentario' comentario_id=comentario.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('¿Eliminar este comentario?')">Eliminar</button>
+                        </form>
+                    {% endif %}
+                </div>
+                <p class="mb-0">{{ comentario.contenido }}</p>
+            </article>
+        {% empty %}
+            <div class="empty-state text-center">No hay comentarios todavía.</div>
+        {% endfor %}
+    </div>
 
-{% if user.is_authenticated %}
-<h3>Añadir comentario</h3>
-<form method="POST" action="{% url 'comentar_receta' receta_id=receta.id %}">
-{% csrf_token %}
-{{ formulario_comentario.contenido }}
-<button type="submit">Comentar</button>
-</form>
-{% endif %}
+    {% if user.is_authenticated %}
+        <div class="form-card p-4">
+            <h3 class="h5 mb-3">Añadir comentario</h3>
+            <form method="POST" action="{% url 'comentar_receta' receta_id=receta.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ formulario_comentario.contenido }}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-brand rounded-pill px-4">Comentar</button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="empty-state text-center">Inicia sesión para comentar y participar en la receta.</div>
+    {% endif %}
+</section>
 
-<a href="{% url 'lista_recetas' %}">Volver</a>
+<a href="{% url 'lista_recetas' %}" class="btn btn-outline-dark rounded-pill px-4">Volver al listado</a>
 {% endblock %}

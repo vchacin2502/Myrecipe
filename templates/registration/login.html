@@ -3,11 +3,43 @@
 {% block titulo %}Iniciar sesión{% endblock %}
 
 {% block content %}
-    <h1>Iniciar sesión</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Entrar</button>
-    </form>
-    <a href="{% url 'registrar_usuario' %}">¿No tienes cuenta? Regístrate</a>
+    <section class="auth-shell">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <div class="auth-illustration p-4 p-lg-5 h-100 d-flex flex-column justify-content-center text-center">
+                    <div>
+                        <h1 class="display-6 fw-semibold mb-3">Iniciar sesión</h1>
+                        <p class="mb-0 text-white-50">Entra para comentar, guardar favoritos y publicar tus propias recetas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="form-card p-4 p-lg-5">
+                    <form method="POST" class="d-grid gap-4">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+                        <div>
+                            <label for="id_username" class="form-label">Nombre de usuario</label>
+                            {{ form.username }}
+                            {{ form.username.errors }}
+                        </div>
+                        <div>
+                            <label for="id_password" class="form-label">Contraseña</label>
+                                <div class="input-group password-field">
+                                    {{ form.password }}
+                                    <button type="button" class="btn btn-outline-secondary password-toggle" data-password-toggle="id_password" aria-label="Mostrar contraseña" aria-pressed="false">👁</button>
+                                </div>
+                            {{ form.password.errors }}
+                        </div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 pt-2">
+                            <button type="submit" class="btn btn-brand rounded-pill px-4">Entrar</button>
+                            <span class="muted-text ms-lg-auto text-lg-end">Si no tienes cuenta, <a href="{% url 'registrar_usuario' %}" class="link-dark fw-semibold">regístrate aquí</a>.</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
