@@ -23,7 +23,6 @@
                         <div>
                             <label for="id_username" class="form-label">Nombre de usuario</label>
                             {{ form.username }}
-                            {{ form.username.errors }}
                         </div>
                         <div>
                             <label for="id_password" class="form-label">Contraseña</label>
@@ -31,7 +30,6 @@
                                     {{ form.password }}
                                     <button type="button" class="btn btn-outline-secondary password-toggle" data-password-toggle="id_password" aria-label="Mostrar contraseña" aria-pressed="false">👁</button>
                                 </div>
-                            {{ form.password.errors }}
                         </div>
                         <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 pt-2">
                             <button type="submit" class="btn btn-brand rounded-pill px-4">Entrar</button>
