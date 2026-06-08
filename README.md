@@ -22,25 +22,31 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Aplicar migraciones:
+3. Crear migraciones:
+
+```bash
+python manage.py makemigrations
+```
+
+4. Aplicar migraciones:
 
 ```bash
 python manage.py migrate
 ```
 
-4. (Opcional) Crear un superusuario:
+5. (Opcional) Crear un superusuario:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-5. Ejecutar el servidor de desarrollo:
+6. Ejecutar el servidor de desarrollo:
 
 ```bash
 python manage.py runserver
 ```
 
-6. Abrir en el navegador:
+7. Abrir en el navegador:
 
 ```
 http://127.0.0.1:8000/
